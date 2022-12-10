@@ -1,0 +1,21 @@
+---
+services:
+  canvas.node:
+    networks:
+      - xsaatchi-net
+    build:
+      context: .
+    env_file:
+      - .env
+    tty: true
+    stdin_open: true
+    container_name: xsaatchi_canvas_node_instance
+    # volumes:
+    #   - .:/data/canvas/current:delegated
+    ports:
+      - 8010:8010
+      # - 9229:9229
+
+networks:
+  xsaatchi-net:
+    external: true
