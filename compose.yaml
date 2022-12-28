@@ -1,21 +1,24 @@
 ---
 services:
-  canvas.node:
+  brush.node:
     networks:
       - xsaatchi-net
+      - legacy-session-net
     build:
       context: .
     env_file:
       - .env
     tty: true
     stdin_open: true
-    container_name: xsaatchi_canvas_node_instance
-    # volumes:
-    #   - .:/data/canvas/current:delegated
+    container_name: xsaatchi_brush_node_instance
+    volumes:
+      - .:/data/brush/current:delegated
     ports:
       - 8010:8010
       # - 9229:9229
 
 networks:
   xsaatchi-net:
+    external: true
+  legacy-session-net:
     external: true

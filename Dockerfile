@@ -1,5 +1,5 @@
 FROM node:latest
-WORKDIR /data/canvas/current
+WORKDIR /data/brush/current
 
 COPY package*.json ./
 RUN npm install
