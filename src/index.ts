@@ -38,6 +38,8 @@ if (!process.env.DEBUG) {
 
 app.use(expressWinston.logger(loggerOptions))
 const debugLog: debug.IDebugger = debug('index')
+
+const PALETTE_URL = 'http://palette.nginx'
 // }}}
 
 // session {{{
@@ -103,6 +105,23 @@ interface RawSessionDataInterface {
 }
 
 class MemcachedUserDataNotFoundException extends Error {}
+
+class ArtworkNotFoundException extends Error {
+  readonly artworkId: string
+  constructor(artworkId: string) {
+    super(`Artwork ${artworkId} not found`)
+    this.artworkId = artworkId
+  }
+}
+
+class HttpException extends Error {
+  readonly response: Response
+  constructor(response: Response) {
+    super('HTTP Exception')
+    this.response = response
+  }
+}
+
 class MemcachedUserDataUnserializationFailedException extends Error {}
 class UserNotLoggedInException extends Error {}
 
@@ -147,6 +166,35 @@ const getMemcachedUserData = async (
 }
 // }}}
 
+// types/interfaces {{{
+interface Artwork {
+
+}
+// }}}
+
+// palette api {{{
+
+/**
+ * @throws ArtworkNotFoundException
+ * @throws HttpException
+ */
+async function getArtworkDataByArtworkId (artworkId: string): Promise<Artwork> {
+  const response = await fetch(`${PALETTE_URL}/artwork/${artworkId}`)
+
+  if (response.status === 404) {
+    throw new ArtworkNotFoundException(artworkId)
+  }
+
+  if (response.status !== 200) {
+    throw new HttpException(response)
+  }
+
+  const json = await response.json()
+
+  return json
+}
+// }}}
+
 // routes {{{
 
 // all-client-data {{{
@@ -156,7 +204,7 @@ app.get('/all-client-data', async (req: express.Request, res: express.Response) 
 
     res.json(memcachedUserData)
   } catch (error) {
-    // debugLog(error)
+    debugLog(error)
 
     if (error instanceof UserNotLoggedInException) {
       res.status(401).json({ error: 'User not logged in' })
@@ -183,6 +231,32 @@ app.get('/all-client-data', async (req: express.Request, res: express.Response) 
     }
 
     res.status(500).json({ error: 'Unknown error' })
+  }
+})
+// }}}
+
+// artworks {{{
+app.get('/artworks/:artworkId', async (req: express.Request, res: express.Response) => {
+  const { params: { artworkId } } = req
+  try {
+    const artworkData = await getArtworkDataByArtworkId(artworkId)
+    res.json(artworkData)
+  } catch (err: any) {
+    if (err instanceof ArtworkNotFoundException) {
+      res.status(404).json({ status: `Artwork ${artworkId} not found` })
+
+      return
+    }
+
+    if (err instanceof HttpException) {
+      debugLog(err)
+      res.status(500).json({ status: `Error ${err.response.status} fetching artwork ${artworkId}`})
+
+      return
+    }
+
+    debugLog(err)
+    res.status(500).json({ status: `Error fetching artwork ${artworkId}` })
   }
 })
 // }}}
