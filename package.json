@@ -8,7 +8,8 @@
     "express-winston": "^4.2.0",
     "memcached": "^2.2.2",
     "php-unserialize": "github:saatchiart/js-php-unserialize",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "zod": "^3.20.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
