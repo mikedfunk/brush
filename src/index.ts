@@ -131,64 +131,67 @@ async function getArtworkDataByArtworkId (artworkId: string): Promise<ArtworkDat
 // routes {{{
 
 // all-client-data {{{
-app.get('/all-client-data', async (req: express.Request, res: express.Response) => {
+app.get('/all-client-data', async (request: express.Request, response: express.Response) => {
   try {
-    const memcachedUserData = await getMemcachedUserData(req, res)
+    const memcachedUserData = await getMemcachedUserData(request, response)
 
-    res.json(memcachedUserData)
-  } catch (error) {
+    response.json(memcachedUserData)
+  } catch (error: any) {
 
     if (error instanceof UserNotLoggedInException) {
-      res.status(401).json({ error: 'User not logged in' })
+      response.status(401).json({ error: 'User not logged in' })
 
       return
     }
 
     if (error instanceof MemcachedUserDataNotFoundException) {
-      res.status(404)
+      response.status(404)
 
       return
     }
 
+    console.error(error)
+
     if (error instanceof MemcachedUserDataUnserializationFailedException) {
-      res.status(500).json({ error: "Failed to deserialize user session data" })
+      response.status(500).json({ error: "Failed to deserialize user session data" })
 
       return
     }
 
     if (error instanceof Error) {
-      res.status(500).json({ error: error.message })
+      response.status(500).json({ error: error.message })
 
       return
     }
 
-    res.status(500).json({ error: 'Unknown error' })
+    response.status(500).json({ error: 'Unknown error' })
   }
 })
 // }}}
 
 // artworks {{{
-app.get('/artworks/:artworkId', async (req: express.Request, res: express.Response) => {
-  const { params: { artworkId } } = req
+app.get('/artworks/:artworkId', async (request: express.Request, response: express.Response) => {
+  const { params: { artworkId } } = request
   try {
     const artworkData = await getArtworkDataByArtworkId(artworkId)
-    res.json(artworkData)
-  } catch (err: any) {
-    if (err instanceof ArtworkNotFoundException) {
-      res.status(404).json({ status: `Artwork ${artworkId} not found` })
+    response.json(artworkData)
+  } catch (error: any) {
+    if (error instanceof ArtworkNotFoundException) {
+      response.status(404).json({ status: `Artwork ${artworkId} not found` })
 
       return
     }
 
-    if (err instanceof HttpException) {
-      console.error(err)
-      res.status(500).json({ status: `Error ${err.response.status} fetching artwork ${artworkId}`})
+    console.error(error)
+
+    if (error instanceof HttpException) {
+      response.status(500).json({ status: `Error ${error.response.status} fetching artwork ${artworkId}`})
 
       return
     }
 
-    console.error(err)
-    res.status(500).json({ status: `Error fetching artwork ${artworkId}` })
+    console.error(error)
+    response.status(500).json({ status: `Error fetching artwork ${artworkId}` })
   }
 })
 // }}}
