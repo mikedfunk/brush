@@ -13,7 +13,13 @@ import { unserializeSession } from 'php-unserialize'
 import cookieParser from 'cookie-parser'
 import { z } from 'zod'
 import { artworkDataParser, rawSessionDataParser, sessionDataParser } from './parsers/index.js'
-import { ArtworkNotFoundException, HttpException, MemcachedUserDataNotFoundException, MemcachedUserDataUnserializationFailedException, UserNotLoggedInException } from './exceptions/index.js'
+import {
+  ArtworkNotFoundException,
+  HttpException,
+  MemcachedUserDataNotFoundException,
+  MemcachedUserDataUnserializationFailedException,
+  UserNotLoggedInException,
+} from './exceptions/index.js'
 
 dotenv.config()
 
@@ -40,26 +46,24 @@ const PALETTE_URL = 'http://palette.nginx'
 // }}}
 
 // session {{{
-const MEMCACHED_URL = 'legacy.session.memcached:11211'
-const MEMCACHED_OPTIONS = {
-  factor: 3, // Connection pool retry exponential backoff factor
+
+const memcached: Memcached = new Memcached('legacy.session.memcached:11211', {
+  // factor: 3, // Connection pool retry exponential backoff factor
   failures: 3, // the number of failed-attempts to a server before it is regarded as 'dead'.
-  maxTimeout: 5000, // 5 seconds, Connection pool retry max delay before retrying
-  minTimeout: 1000, // 1 seconds, Connection pool retry min delay before retrying
-  randomize: false, // Connection pool retry timeout randomization
+  // maxTimeout: 5000, // 5 seconds, Connection pool retry max delay before retrying
+  // minTimeout: 1000, // 1 seconds, Connection pool retry min delay before retrying
+  // randomize: false, // Connection pool retry timeout randomization
   reconnect: 10000, // 10 seconds, default is ( 18000000 ms => 18000 seconds => 300 minutes )
   retries: 1, // Connection pool retries to pull connection from pool
   timeout: 5000, // 5 seconds, time after which Memcached sends a connection timeout
-}
-const memcached = new Memcached(MEMCACHED_URL, MEMCACHED_OPTIONS)
-const memcachedGet = promisify(memcached.get).bind(memcached)
+})
+const memcachedGet: (key: string) => Promise<any> = promisify(memcached.get).bind(memcached)
 // const memcachedSet = promisify(memcached.set).bind(memcached)
 // const memcachedDelete = promisify(memcached.del).bind(memcached)
 
 const SESSION_COOKIE_NAME = 'saatchisclocal'
 
 type SessionDataInterface = z.infer<typeof sessionDataParser>
-
 type RawSessionDataInterface = z.infer<typeof rawSessionDataParser>
 
 /**
@@ -71,10 +75,10 @@ const getMemcachedUserData = async (
   req: express.Request,
   res: express.Response
 ): Promise<express.Response<SessionDataInterface>> => {
-  const sessionCookieName = req.cookies[SESSION_COOKIE_NAME] ?? null
+  const sessionCookieName: string | null = req.cookies[SESSION_COOKIE_NAME] ?? null
 
   if (!sessionCookieName) {
-    throw new UserNotLoggedInException("User is not logged in")
+    throw new UserNotLoggedInException('User is not logged in')
   }
 
   const serializedSessionData = await memcachedGet(`memc.sess.saatchi_legacy.${sessionCookieName}`)
@@ -83,7 +87,9 @@ const getMemcachedUserData = async (
     throw new MemcachedUserDataNotFoundException('Memcached user data not found in session')
   }
 
-  const rawSessionData: RawSessionDataInterface = rawSessionDataParser.parse(unserializeSession(serializedSessionData))
+  const rawSessionData: RawSessionDataInterface = rawSessionDataParser.parse(
+    unserializeSession(serializedSessionData)
+  )
 
   if (!rawSessionData.Zend_Auth?.storage?.body) {
     throw new MemcachedUserDataUnserializationFailedException(
@@ -110,7 +116,7 @@ type ArtworkDataInterface = z.infer<typeof artworkDataParser>
  * @throws ArtworkNotFoundException
  * @throws HttpException
  */
-async function getArtworkDataByArtworkId (artworkId: string): Promise<ArtworkDataInterface> {
+async function getArtworkDataByArtworkId(artworkId: string): Promise<ArtworkDataInterface> {
   const response = await fetch(`${PALETTE_URL}/artwork/${artworkId}`)
 
   if (response.status === 404) {
@@ -137,7 +143,6 @@ app.get('/all-client-data', async (request: express.Request, response: express.R
 
     response.json(memcachedUserData)
   } catch (error: any) {
-
     if (error instanceof UserNotLoggedInException) {
       response.status(401).json({ error: 'User not logged in' })
 
@@ -153,7 +158,7 @@ app.get('/all-client-data', async (request: express.Request, response: express.R
     console.error(error)
 
     if (error instanceof MemcachedUserDataUnserializationFailedException) {
-      response.status(500).json({ error: "Failed to deserialize user session data" })
+      response.status(500).json({ error: 'Failed to deserialize user session data' })
 
       return
     }
@@ -170,30 +175,37 @@ app.get('/all-client-data', async (request: express.Request, response: express.R
 // }}}
 
 // artworks {{{
-app.get('/artworks/:artworkId', async (request: express.Request, response: express.Response) => {
-  const { params: { artworkId } } = request
-  try {
-    const artworkData = await getArtworkDataByArtworkId(artworkId)
-    response.json(artworkData)
-  } catch (error: any) {
-    if (error instanceof ArtworkNotFoundException) {
-      response.status(404).json({ status: `Artwork ${artworkId} not found` })
+app.get(
+  '/artworks/:artworkId',
+  async (request: express.Request, response: express.Response): Promise<void> => {
+    const {
+      params: { artworkId },
+    } = request
+    try {
+      const artworkData = await getArtworkDataByArtworkId(artworkId)
+      response.json(artworkData)
+    } catch (error: any) {
+      if (error instanceof ArtworkNotFoundException) {
+        response.status(404).json({ status: `Artwork ${artworkId} not found` })
 
-      return
+        return
+      }
+
+      console.error(error)
+
+      if (error instanceof HttpException) {
+        response
+          .status(500)
+          .json({ status: `Error ${error.response.status} fetching artwork ${artworkId}` })
+
+        return
+      }
+
+      console.error(error)
+      response.status(500).json({ status: `Error fetching artwork ${artworkId}` })
     }
-
-    console.error(error)
-
-    if (error instanceof HttpException) {
-      response.status(500).json({ status: `Error ${error.response.status} fetching artwork ${artworkId}`})
-
-      return
-    }
-
-    console.error(error)
-    response.status(500).json({ status: `Error fetching artwork ${artworkId}` })
   }
-})
+)
 // }}}
 
 // }}}
