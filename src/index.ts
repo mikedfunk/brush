@@ -12,7 +12,7 @@ import * as dotenv from 'dotenv'
 import { unserializeSession } from 'php-unserialize'
 import cookieParser from 'cookie-parser'
 import { z } from 'zod'
-import { artworkDataParser, rawSessionDataParser, sessionDataParser } from './parsers/index.js'
+import { rawSessionDataParser, sessionDataParser } from './parsers/index.js'
 import {
   ArtworkNotFoundException,
   HttpException,
@@ -20,6 +20,7 @@ import {
   MemcachedUserDataUnserializationFailedException,
   UserNotLoggedInException,
 } from './exceptions/index.js'
+import { getArtworkDataByArtworkId } from './paletteApi/index.js'
 
 dotenv.config()
 
@@ -41,8 +42,6 @@ const loggerOptions: expressWinston.LoggerOptions = {
 }
 
 app.use(expressWinston.logger(loggerOptions))
-
-const PALETTE_URL = 'http://palette.nginx'
 // }}}
 
 // session {{{
@@ -105,32 +104,6 @@ const getMemcachedUserData = async (
     measurementSystem,
     userFavorites: Object.values(zendUserFavorites),
   })
-}
-// }}}
-
-// palette api {{{
-
-type ArtworkDataInterface = z.infer<typeof artworkDataParser>
-
-/**
- * @throws ArtworkNotFoundException
- * @throws HttpException
- */
-async function getArtworkDataByArtworkId(artworkId: string): Promise<ArtworkDataInterface> {
-  const response = await fetch(`${PALETTE_URL}/artwork/${artworkId}`)
-
-  if (response.status === 404) {
-    throw new ArtworkNotFoundException(artworkId)
-  }
-
-  if (response.status !== 200) {
-    throw new HttpException(response)
-  }
-
-  const json = await response.json()
-  const artworkData = artworkDataParser.parse(json)
-
-  return artworkData
 }
 // }}}
 
