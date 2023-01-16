@@ -1,7 +1,4 @@
-const sessionDataParser = zendSessionDataParser.extend({
-  userFavorites: favoriteArtworkIdsParser,
-  measurementSystem: measurementSystemParser,
-})
+import { z } from 'zod'
 
 const measurementSystemParser = z.enum(['INCH', 'CENTIMETER']).optional()
 
@@ -99,6 +96,11 @@ const artworkDataParser = z.object({
   slug: z.string(),
   url: z.string(),
   products: z.array(z.object({})),
+})
+
+const sessionDataParser = zendSessionDataParser.extend({
+  userFavorites: favoriteArtworkIdsParser,
+  measurementSystem: measurementSystemParser,
 })
 
 export {
