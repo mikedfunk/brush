@@ -1,6 +1,5 @@
 // vim: set fdm=marker:
 
-// setup {{{
 import express from 'express'
 import * as http from 'http'
 import * as winston from 'winston'
@@ -18,15 +17,18 @@ import {
 import { getArtworkDataByArtworkId } from './paletteApi/index.js'
 import { getMemcachedUserData } from './session/index.js'
 
+// express app setup {{{
+
 dotenv.config()
 
 const app: express.Application = express()
 
+// use middleware
 app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
 
-// here we are preparing the expressWinston logging middleware configuration,
+// prepare the expressWinston logging middleware configuration,
 // which will automatically log all HTTP requests handled by Express.js
 const loggerOptions: expressWinston.LoggerOptions = {
   transports: [new winston.transports.Console()],
@@ -38,6 +40,7 @@ const loggerOptions: expressWinston.LoggerOptions = {
 }
 
 app.use(expressWinston.logger(loggerOptions))
+
 // }}}
 
 // routes {{{
@@ -80,7 +83,7 @@ app.get('/all-client-data', async (request: express.Request, response: express.R
 })
 // }}}
 
-// artworks {{{
+// get artwork {{{
 app.get(
   '/artworks/:artworkId',
   async (request: express.Request, response: express.Response): Promise<void> => {
