@@ -7,8 +7,10 @@ import {
   UserNotLoggedInException,
   MemcachedUserDataNotFoundException,
   MemcachedUserDataUnserializationFailedException,
-} from '../exceptions/index.js'
-import { rawSessionDataParser, sessionDataParser } from '../parsers/index.js'
+} from './exceptions/index.js'
+import { rawSessionDataParser, sessionDataParser } from './parsers/index.js'
+
+const SESSION_COOKIE_NAME = 'saatchisclocal'
 
 const memcached: Memcached = new Memcached('legacy.session.memcached:11211', {
   // factor: 3, // Connection pool retry exponential backoff factor
@@ -24,8 +26,6 @@ const memcachedGet: (key: string) => Promise<any> = promisify(memcached.get).bin
 // const memcachedSet = promisify(memcached.set).bind(memcached)
 // const memcachedDelete = promisify(memcached.del).bind(memcached)
 
-const SESSION_COOKIE_NAME = 'saatchisclocal'
-
 type SessionDataInterface = z.infer<typeof sessionDataParser>
 type RawSessionDataInterface = z.infer<typeof rawSessionDataParser>
 
@@ -35,16 +35,13 @@ type RawSessionDataInterface = z.infer<typeof rawSessionDataParser>
  * @throws UserNotLoggedInException
  */
 async function getMemcachedUserData(
-  req: express.Request,
-  res: express.Response
-): Promise<express.Response<SessionDataInterface>> {
-  const sessionCookieName: string | null = req.cookies[SESSION_COOKIE_NAME] ?? null
-
-  if (!sessionCookieName) {
+  sessionCookie: string | null
+): Promise<SessionDataInterface> {
+  if (!sessionCookie) {
     throw new UserNotLoggedInException('User is not logged in')
   }
 
-  const serializedSessionData = await memcachedGet(`memc.sess.saatchi_legacy.${sessionCookieName}`)
+  const serializedSessionData = await memcachedGet(`memc.sess.saatchi_legacy.${sessionCookie}`)
 
   if (!serializedSessionData) {
     throw new MemcachedUserDataNotFoundException('Memcached user data not found in session')
@@ -63,11 +60,11 @@ async function getMemcachedUserData(
   const measurementSystem = rawSessionData?.Saatchi?.measurementSystem ?? 'INCH'
   const zendUserFavorites = rawSessionData?.Saatchi?.userFavorites ?? {}
 
-  return res.json({
+  return {
     ...rawSessionData.Zend_Auth.storage.body,
     measurementSystem,
     userFavorites: Object.values(zendUserFavorites),
-  })
+  }
 }
 
-export { getMemcachedUserData }
+export { getMemcachedUserData, SESSION_COOKIE_NAME }
