@@ -26,7 +26,6 @@ async function getArtwork(request: express.Request, response: express.Response):
       return
     }
 
-    console.error(error)
     response.status(500).json({ status: `Error fetching artwork ${artworkId}` })
   }
 }
