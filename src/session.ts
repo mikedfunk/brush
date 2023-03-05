@@ -34,9 +34,7 @@ type RawSessionDataInterface = z.infer<typeof rawSessionDataParser>
  * @throws MemcachedUserDataUnserializationFailedException
  * @throws UserNotLoggedInException
  */
-async function getMemcachedUserData(
-  sessionCookie: string | null
-): Promise<SessionDataInterface> {
+async function getMemcachedUserData(sessionCookie: string | null): Promise<SessionDataInterface> {
   if (!sessionCookie) {
     throw new UserNotLoggedInException('User is not logged in')
   }
