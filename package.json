@@ -31,10 +31,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "tsc && node --unhandled-rejections=strict ./dist/index.js",
+    "build": "npm exec tsc",
+    "start": "npm exec tsc && node --unhandled-rejections=strict ./dist/index.js",
     "debug": "export DEBUG=* && npm run start",
-    "test": "vitest run",
+    "test": "npm exec vitest run",
+    "lint": "npm exec eslint",
     "coverage": "vitest run --coverage"
   },
   "keywords": [],
