@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const MATERIALS = [
+const ARTWORK_MATERIALS = [
   'Aluminium',
   'Bronze',
   'Canvas',
@@ -23,19 +23,19 @@ const MATERIALS = [
 
 const artworkDataParser = z.object({
   artwork_id: z.string().min(1),
-  is_legacy_artwork: z.boolean(),
+  // is_legacy_artwork: z.boolean(),
   legacy_user_art_id: z.number().min(1),
   user_id: z.number().min(1),
-  created_at: z.number().min(1),
-  uploaded_at: z.number().min(1),
-  modified_at: z.number().min(1),
+  // created_at: z.number().min(1),
+  // uploaded_at: z.number().min(1),
+  // modified_at: z.number().min(1),
   year_produced: z.number().min(1),
   is_deleted: z.boolean(),
   artwork_image: z.object({
     main_url: z.string().min(1),
     thumbnail_url: z.string().min(1),
     polaroid_url: z.string().min(1),
-    fullscreen_url: z.string().min(1),
+    // fullscreen_url: z.string().min(1),
     original_width: z.number().min(1),
     original_height: z.number().min(1),
     crops: z.object({
@@ -318,7 +318,7 @@ const artworkDataParser = z.object({
     ])
   ),
   keywords: z.array(z.string().min(1)),
-  materials: z.array(z.enum(MATERIALS)),
+  materials: z.array(z.enum(ARTWORK_MATERIALS)),
   has_original: z.boolean(),
   is_multipanel: z.boolean(),
   panels: z.number().min(1),
@@ -331,17 +331,17 @@ const artworkDataParser = z.object({
   url: z.string().min(1),
   products: z.array(
     z.object({
-      legacy_sku: z.string().min(1),
+      // legacy_sku: z.string().min(1),
       sku: z.string().min(1),
       is_original: z.boolean(),
       is_open_edition_print: z.boolean(),
       is_limited_edition_print: z.boolean(),
-      is_aple: z.boolean(),
+      // is_aple: z.boolean(),
       price: z.number().min(1),
       width: z.string().min(1), // float as string
       height: z.string().min(1), // float as string
       depth: z.string().min(1), // float as string
-      material: z.enum([...MATERIALS, '']),
+      material: z.enum(['Fine Art Paper', 'Photo Paper', 'Canvas', '']),
       options: z.array(
         z.object({
           id: z.string().min(1),
@@ -356,38 +356,36 @@ const artworkDataParser = z.object({
           framed_width: z.number().min(1).nullable(), // float
           framed_height: z.number().min(1).nullable(), // float
         })
-      ),
+      ).optional(),
       units_produced: z.number().min(1),
       is_sold_out: z.boolean(),
       is_reserved: z.boolean(),
       is_available_for_sale: z.boolean(),
-      id: z.number().min(1),
-      original: z
-        .object({
-          aisp: z.object({
-            freight_amount: z.number(),
-            version: z.string(),
-            bucket: z.string(),
-          }),
-          has_original_frame: z.boolean(),
-          original_frame_color: z
-            .enum(['black', 'brown', 'white', 'silver', 'gold', 'patina', 'other'])
-            .nullable(),
-          packaging_option: z.enum(['rolled', 'flat_cardboard', 'flat_crate']),
-          is_ready_to_hang: z.boolean().nullable(),
-          address_book_item_id: z.string().min(1),
-          ships_from_country_code: z.string().length(2),
-          ships_from_country_name: z.string().min(1),
-          shipping_dimensions: z.object({
-            dimensional_weight: z.number(),
-            height: z.number().min(1),
-            width: z.number().min(1),
-            depth: z.number().min(0),
-          }),
-          days_to_produce: z.number().min(1).nullable(),
-        })
-        .optional(),
-    })
+      // id: z.number().min(1),
+      original: z.object({
+        aisp: z.object({
+          freight_amount: z.number(),
+          version: z.string(),
+          bucket: z.string(),
+        }),
+        has_original_frame: z.boolean(),
+        original_frame_color: z
+          .enum(['black', 'brown', 'white', 'silver', 'gold', 'patina', 'other'])
+          .nullable(),
+        packaging_option: z.enum(['rolled', 'flat_cardboard', 'flat_crate']),
+        is_ready_to_hang: z.boolean().nullable(),
+        address_book_item_id: z.string().min(1),
+        ships_from_country_code: z.string().length(2),
+        ships_from_country_name: z.string().min(1),
+        shipping_dimensions: z.object({
+          dimensional_weight: z.number(),
+          height: z.number().min(1),
+          width: z.number().min(1),
+          depth: z.number().min(0),
+        }),
+        days_to_produce: z.number().min(1).nullable(),
+      }).optional(),
+    }),
   ),
 })
 

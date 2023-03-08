@@ -3,26 +3,26 @@ import { z } from 'zod'
 import { artworkDataParser } from '../parsers/index.js'
 import { getArtworkDataByArtworkId } from './index.js'
 
-describe('paletteApi', () => {
+describe('paintApi', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
   it('gets artwork data by artwork id', async () => {
-    const responseJson: z.infer<typeof artworkDataParser> = {
+    const artworkJson: z.infer<typeof artworkDataParser> = {
       artwork_id: '3353900',
-      is_legacy_artwork: false,
+      // is_legacy_artwork: false,
       legacy_user_art_id: 3353900,
       user_id: 808363,
-      created_at: 1677906573,
-      uploaded_at: 1677906573,
-      modified_at: 1677906573,
+      // created_at: 1677906573,
+      // uploaded_at: 1677906573,
+      // modified_at: 1677906573,
       year_produced: 2020,
       is_deleted: false,
       artwork_image: {
         main_url: 'http://www.saatchiart.com/art.jpg',
         thumbnail_url: 'http://www.saatchiart.com/art-t.jpg',
         polaroid_url: 'http://www.saatchiart.com/art-p.jpg',
-        fullscreen_url: 'http://www.saatchiart.com/art-f.jpg',
+        // fullscreen_url: 'http://www.saatchiart.com/art-f.jpg',
         original_width: 20,
         original_height: 20,
         crops: {
@@ -81,12 +81,12 @@ describe('paletteApi', () => {
       url: 'https://www.saatchiart.com/my-art',
       products: [
         {
-          legacy_sku: 'P1-U2-A3',
+          // legacy_sku: 'P1-U2-A3',
           sku: 'P1-U2-A3-T1',
           is_original: true,
           is_open_edition_print: false,
           is_limited_edition_print: false,
-          is_aple: false,
+          // is_aple: false,
           price: 2000_00,
           width: '20.0',
           height: '20.0',
@@ -97,7 +97,7 @@ describe('paletteApi', () => {
           is_sold_out: false,
           is_reserved: false,
           is_available_for_sale: true,
-          id: 1,
+          // id: 1,
           original: {
             aisp: {
               freight_amount: 100_00,
@@ -121,17 +121,17 @@ describe('paletteApi', () => {
           },
         },
         {
-          legacy_sku: 'P111-U2-A3',
+          // legacy_sku: 'P111-U2-A3',
           sku: 'P1111-U2-A3-T2',
           is_original: false,
           is_open_edition_print: true,
           is_limited_edition_print: false,
-          is_aple: false,
+          // is_aple: false,
           price: 2000_00,
           width: '20.0',
           height: '20.0',
           depth: '20.0',
-          material: 'Paper',
+          material: 'Fine Art Paper',
           options: [
             {
               id: 'F1',
@@ -151,10 +151,12 @@ describe('paletteApi', () => {
           is_sold_out: false,
           is_reserved: false,
           is_available_for_sale: true,
-          id: 2,
+          // id: 2,
         },
       ],
     }
+
+    const responseJson = { data: artworkJson }
 
     const fetch = vi.fn()
     const response = { status: 200, json: vi.fn() }
@@ -165,7 +167,7 @@ describe('paletteApi', () => {
     const result = await getArtworkDataByArtworkId('3353900')
 
     expect(result).toEqual(responseJson)
-    expect(fetch).toHaveBeenCalledWith('http://palette.nginx/artwork/3353900')
+    expect(fetch).toHaveBeenCalledWith('http://paint.nginx/artwork/3353900')
     expect(response.json).toHaveBeenCalledWith()
   })
 })

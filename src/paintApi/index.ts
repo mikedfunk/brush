@@ -2,7 +2,7 @@ import { artworkDataParser } from '../parsers/index.js'
 import { z } from 'zod'
 import { ArtworkNotFoundException, HttpException } from '../exceptions/index.js'
 
-const PALETTE_URL = 'http://palette.nginx'
+const PAINT_URL = 'http://paint.nginx'
 
 type ArtworkDataInterface = z.infer<typeof artworkDataParser>
 
@@ -10,8 +10,8 @@ type ArtworkDataInterface = z.infer<typeof artworkDataParser>
  * @throws ArtworkNotFoundException
  * @throws HttpException
  */
-async function getArtworkDataByArtworkId(artworkId: string): Promise<ArtworkDataInterface> {
-  const response = await fetch(`${PALETTE_URL}/artwork/${artworkId}`)
+async function getArtworkDataByArtworkId(artworkId: string): Promise<{ data: ArtworkDataInterface }> {
+  const response = await fetch(`${PAINT_URL}/artwork/${artworkId}`)
 
   if (response.status === 404) {
     throw new ArtworkNotFoundException(artworkId)
@@ -22,9 +22,9 @@ async function getArtworkDataByArtworkId(artworkId: string): Promise<ArtworkData
   }
 
   const json = await response.json()
-  const artworkData = artworkDataParser.parse(json)
+  const artworkData = artworkDataParser.parse(json.data)
 
-  return artworkData
+  return { data: artworkData }
 }
 
 export { getArtworkDataByArtworkId }

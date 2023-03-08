@@ -1,6 +1,6 @@
 import express from 'express'
 import { ArtworkNotFoundException, HttpException } from '../exceptions/index.js'
-import { getArtworkDataByArtworkId } from '../paletteApi/index.js'
+import { getArtworkDataByArtworkId } from '../paintApi/index.js'
 
 async function getArtwork(request: express.Request, response: express.Response): Promise<void> {
   const {
