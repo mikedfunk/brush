@@ -11,7 +11,7 @@ type ArtworkDataInterface = z.infer<typeof artworkDataParser>
  * @throws HttpException
  */
 async function getArtworkDataByArtworkId(artworkId: string): Promise<{ data: ArtworkDataInterface }> {
-  const response = await fetch(`${PAINT_URL}/artwork/${artworkId}`)
+  const response = await fetch(`${PAINT_URL}/browsing/artwork/${artworkId}`)
 
   if (response.status === 404) {
     throw new ArtworkNotFoundException(artworkId)

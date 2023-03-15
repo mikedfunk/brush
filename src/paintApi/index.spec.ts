@@ -167,7 +167,7 @@ describe('paintApi', () => {
     const result = await getArtworkDataByArtworkId('3353900')
 
     expect(result).toEqual(responseJson)
-    expect(fetch).toHaveBeenCalledWith('http://paint.nginx/artwork/3353900')
+    expect(fetch).toHaveBeenCalledWith('http://paint.nginx/browsing/artwork/3353900')
     expect(response.json).toHaveBeenCalledWith()
   })
 })

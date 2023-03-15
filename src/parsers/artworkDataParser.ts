@@ -276,7 +276,6 @@ const artworkDataParser = z.object({
       'Mosaic',
       'Moving Images',
       'Neon',
-      'Mixed Media',
       'NFT',
       'Oil',
       'Paint',
