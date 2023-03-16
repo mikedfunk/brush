@@ -1,0 +1,287 @@
+---
+openapi: '3.0.2'
+info:
+  title: Brush 🖌️
+  description: An experiment in replacing the SaatchiArt Easel API.
+  version: '0.1'
+  license: { name: 'Copyright Leaf Group, Ltd.', url: https://www.leafgroup.com }
+  contact: { name: Mike Funk, email: "mike@mikefunk.com" }
+servers:
+  - url: https://brush.local.saatchiart.com
+    description: local
+tags:
+  - name: Artworks
+    description: Artwork-related endpoints.
+  - name: Users
+    description: User-related endpoints.
+paths:
+  /artwork/{artwork_id}:
+    get:
+      operationId: getArtworkById
+      summary: Get Artwork
+      description: Get one artwork by artwork id.
+      tags:
+        - Artworks
+      parameters:
+        - name: artwork_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - artwork_id
+                      - legacy_user_art_id
+                      - user_id
+                      - year_produced
+                      - is_deleted
+                      - artwork_image
+                      - additional_images
+                      - youtube_video_id
+                      - title
+                      - width
+                      - height
+                      - depth
+                      - description
+                      - total_likes
+                      - total_views
+                      - total_curation_votes
+                      - category
+                      - subject
+                      - styles
+                      - mediums
+                      - keywords
+                      - materials
+                      - has_original
+                      - is_multipanel
+                      - panels
+                      - is_safe
+                      - visibility
+                      - has_open_editions
+                      - has_limited_editions
+                      - cheapest_print_price
+                      - slug
+                      - url
+                      - can_be_published
+                      - products
+                    properties:
+                      artwork_id: { type: string }
+                      legacy_user_art_id: { type: integer, minimum: 1 }
+                      user_id: { type: integer, minimum: 1 }
+                      year_produced: { type: integer, minimum: 1 }
+                      is_deleted: { type: boolean }
+                      artwork_image:
+                        type: object
+                        required:
+                          - main_url
+                          - original_width
+                          - original_height
+                          - thumbnail_url
+                          - polaroid_url
+                          - crops
+                        properties:
+                          main_url: { type: string }
+                          original_width: { type: integer, minimum: 0, description: In pixels }
+                          original_height: { type: integer, minimum: 0, description: In pixels }
+                          thumbnail_url: { type: string }
+                          polaroid_url: { type: string }
+                          crops:
+                            type: array
+                            items:
+                              type: object
+                              required: [ studio ]
+                              properties:
+                                studio:
+                                  type: object
+                                  required: [ square, print ]
+                                  properties:
+                                    square:
+                                      type: object
+                                      required: [ x, y, width, height ]
+                                      properties:
+                                        x: { type: integer, minimum: 0, description: In pixels }
+                                        y: { type: integer, minimum: 0, description: In pixels }
+                                        width: { type: integer, minimum: 0, description: In pixels }
+                                        height: { type: integer, minimum: 0, description: In pixels }
+                                    print:
+                                      type: object
+                                      required: [ x, y, width, height ]
+                                      properties:
+                                        x: { type: integer, nullable: true, description: In pixels }
+                                        y: { type: integer, nullable: true, description: In pixels }
+                                        width: { type: integer, nullable: true, description: In pixels }
+                                        height: { type: integer, nullable: true, description: In pixels }
+                      additional_images:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - main_url
+                            - thumbnail_url
+                            - polaroid_url
+                            - main_width
+                            - main_height
+                          properties:
+                            main_url: { type: string }
+                            thumbnail_url: { type: string }
+                            polaroid_url: { type: string }
+                            main_width: { type: integer, minimum: 0, description: In pixels }
+                            main_height: { type: integer, minimum: 0, description: In pixels }
+                      youtube_video_id: { type: string, nullable: true }
+                      title: { type: string }
+                      width: { type: string, description: In centimeters }
+                      height: { type: string, description: In centimeters }
+                      depth: { type: string, description: In centimeters }
+                      description: { type: string }
+                      total_likes: { type: integer, minimum: 0 }
+                      total_views: { type: integer, minimum: 0 }
+                      total_curation_votes: { type: integer, minimum: 0 }
+                      category: { type: string }
+                      subject: { type: string, nullable: true }
+                      styles: { type: array, items: { type: string } }
+                      mediums: { type: array, items: { type: string } }
+                      keywords: { type: array, items: { type: string } }
+                      materials: { type: array, items: { type: string } }
+                      has_original: { type: boolean }
+                      is_multipanel: { type: boolean }
+                      panels: { type: integer, minimum: 1 }
+                      is_safe: { type: boolean }
+                      visibility: { type: string, enum: [ published, draft ] }
+                      has_open_editions: { type: boolean }
+                      has_limited_editions: { type: boolean }
+                      cheapest_print_price: { type: integer, minimum: 1, nullable: true, description: In cents }
+                      slug: { type: string, nullable: true }
+                      url: { type: string, nullable: true }
+                      can_be_published: { type: boolean }
+                      products:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - sku
+                            - is_original
+                            - is_open_edition_print
+                            - is_limited_edition_print
+                            - price
+                            - width
+                            - height
+                            - depth
+                            - material
+                            - units_produced
+                            - is_sold_out
+                            - is_reserved
+                            - is_landscape
+                            - is_available_for_sale
+                          properties:
+                            sku: { type: string }
+                            is_original: { type: boolean }
+                            is_open_edition_print: { type: boolean }
+                            is_limited_edition_print: { type: boolean }
+                            price: { type: integer, minimum: 1, description: In cents }
+                            width: { type: string, description: In centimeters }
+                            height: { type: string, description: In centimeters }
+                            depth: { type: string, description: In centimeters }
+                            material: { type: string, nullable: true }
+                            units_produced: { type: integer, minimum: 1 }
+                            is_sold_out: { type: boolean }
+                            is_reserved: { type: boolean }
+                            is_landscape: { type: boolean }
+                            is_available_for_sale: { type: boolean }
+                            options:
+                              type: array
+                              items:
+                                type: object
+                                required:
+                                  - id
+                                  - title
+                                properties:
+                                  id: { type: string }
+                                  framing_type_id: { type: string }
+                                  extended_description: { type: string }
+                                  description: { type: string }
+                                  title: { type: string }
+                                  price: { type: integer, minimum: 0, description: In cents }
+                                  width: { type: string, description: In inches }
+                                  height: { type: string, description: In inches }
+                                  mat_size: { type: integer, minimum: 0, description: In inches }
+                                  framed_width: { type: number, minimum: 0, description: In inches }
+                                  framed_height: { type: number, minimum: 0, description: In inches }
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ValidationError' }
+              example: { errors: [ { code: INVALID_PARAMETER } ] }
+  /all-client-data:
+    get:
+      operationId: getAllCientData
+      summary: Get All Client Data
+      description: Get all user and session data for the logged in user.
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - first_name
+                  - last_name
+                  - email
+                  - username
+                  - user_type_id
+                  - userFavorites
+                  - measurementSystem
+                  - isEaselAdmin
+                  - is_limited_artist
+                properties:
+                  id: { type: number, minimum: 1 }
+                  email: { type: string, minimum: 1, format: email }
+                  username: { type: string, minimum: 1, nullable: true }
+                  user_type_id: { type: number, minimum: 1, maximum: 3 }
+                  first_name: { type: string, minimum: 1 }
+                  last_name: { type: string }
+                  isEaselAdmin: { type: boolean }
+                  is_limited_artist: { type: boolean }
+                  admin_full_name: { type: string, minimum: 1 }
+                  adminId: { type: number, minimum: 1 }
+                  is_verified_to_sell: { type: boolean }
+                  check_in_timer_started_at: { type: string, minimum: 1, nullable: true }
+                  userFavorites:
+                    type: array
+                    items: { type: number, minimum: 1 }
+                  measurementSystem: { type: string, enum: [ 'INCH', 'CENTIMETER' ] }
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ error ]
+                properties:
+                  error: { type: string }
+
+components:
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }

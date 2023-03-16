@@ -1,6 +1,6 @@
 import { afterEach, describe, it, expect, vi } from 'vitest'
 import { z } from 'zod'
-import { artworkDataParser } from '../parsers/index.js'
+import { artworkDataParser } from '../../parser/index.js'
 import { getArtworkDataByArtworkId } from './index.js'
 
 describe('paintApi', () => {

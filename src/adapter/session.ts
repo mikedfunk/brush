@@ -1,4 +1,3 @@
-import express from 'express'
 import Memcached from 'memcached'
 import { unserializeSession } from 'php-unserialize'
 import { promisify } from 'util'
@@ -7,8 +6,8 @@ import {
   UserNotLoggedInException,
   MemcachedUserDataNotFoundException,
   MemcachedUserDataUnserializationFailedException,
-} from './exceptions/index.js'
-import { rawSessionDataParser, sessionDataParser } from './parsers/index.js'
+} from '../exception/index.js'
+import { rawSessionDataParser, sessionDataParser } from '../parser/index.js'
 
 const SESSION_COOKIE_NAME = 'saatchisclocal'
 

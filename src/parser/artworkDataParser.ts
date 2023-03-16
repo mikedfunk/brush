@@ -340,7 +340,7 @@ const artworkDataParser = z.object({
       width: z.string().min(1), // float as string
       height: z.string().min(1), // float as string
       depth: z.string().min(1), // float as string
-      material: z.enum(['Fine Art Paper', 'Photo Paper', 'Canvas', '']),
+      material: z.enum(['Fine Art Paper', 'Photo Paper', 'Canvas', '']).optional(),
       options: z.array(
         z.object({
           id: z.string().min(1),

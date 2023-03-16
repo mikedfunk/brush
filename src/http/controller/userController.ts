@@ -1,10 +1,11 @@
 import express from 'express'
+import { ZodError } from 'zod'
 import {
   MemcachedUserDataNotFoundException,
   MemcachedUserDataUnserializationFailedException,
   UserNotLoggedInException,
-} from '../exceptions/index.js'
-import { getMemcachedUserData, SESSION_COOKIE_NAME } from '../session.js'
+} from '../../exception/index.js'
+import { getMemcachedUserData, SESSION_COOKIE_NAME } from '../../adapter/session.js'
 
 async function getAllClientData(
   request: express.Request,
@@ -32,6 +33,12 @@ async function getAllClientData(
 
     if (error instanceof MemcachedUserDataUnserializationFailedException) {
       response.status(500).json({ error: 'Failed to deserialize user session data' })
+
+      return
+    }
+
+    if (error instanceof ZodError) {
+      response.status(500).json({ error: error.errors })
 
       return
     }

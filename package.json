@@ -31,12 +31,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npm exec tsc",
-    "start": "npm exec tsc && node --unhandled-rejections=strict ./dist/index.js",
+    "build": "pnpm exec tsc",
+    "start": "pnpm exec tsc && node --unhandled-rejections=strict ./dist/index.js",
     "debug": "export DEBUG=* && npm run start",
-    "test": "npm exec vitest run",
-    "lint": "npm exec eslint",
-    "coverage": "vitest run --coverage"
+    "test": "pnpm exec vitest run",
+    "lint": "pnpm exec eslint",
+    "coverage": "pnpm exec vitest run --coverage",
+    "openapi": "pnpm --package=@redocly/cli dlx redocly preview-docs openapi.yml"
   },
   "keywords": [],
   "author": "",

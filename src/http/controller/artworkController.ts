@@ -1,6 +1,7 @@
 import express from 'express'
-import { ArtworkNotFoundException, HttpException } from '../exceptions/index.js'
-import { getArtworkDataByArtworkId } from '../paintApi/index.js'
+import { ArtworkNotFoundException, HttpException } from '../../exception/index.js'
+import { getArtworkDataByArtworkId } from '../../adapter/paintApi/index.js'
+import { ZodError } from 'zod'
 
 async function getArtwork(request: express.Request, response: express.Response): Promise<void> {
   const {
@@ -22,6 +23,12 @@ async function getArtwork(request: express.Request, response: express.Response):
       response
         .status(500)
         .json({ status: `Error ${error.response.status} fetching artwork ${artworkId}` })
+
+      return
+    }
+
+    if (error instanceof ZodError) {
+      response.status(500).json({ error: error.errors })
 
       return
     }

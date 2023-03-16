@@ -1,6 +1,6 @@
-import { artworkDataParser } from '../parsers/index.js'
+import { artworkDataParser } from '../../parser/index.js'
 import { z } from 'zod'
-import { ArtworkNotFoundException, HttpException } from '../exceptions/index.js'
+import { ArtworkNotFoundException, HttpException } from '../../exception/index.js'
 
 const PAINT_URL = 'http://paint.nginx'
 

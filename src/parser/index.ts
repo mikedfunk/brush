@@ -6,7 +6,7 @@ const favoriteArtworkIdsParser = z.array(z.number().min(1)).catch([]) // if it's
 
 const zendSessionDataParser = z.object({
   admin_full_name: z.string().min(1).optional(),
-  adminId: z.number().min(1).optional(),
+  adminId: z.number().min(1).optional().catch(0),
   check_in_timer_started_at: z.string().min(1).optional().nullable(),
   email: z.string().min(1),
   first_name: z.string().min(1),

@@ -5,7 +5,7 @@ import * as expressWinston from 'express-winston'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
-import routes from './routes.js'
+import routes from './http/routes.js'
 
 dotenv.config()
 
