@@ -16,3 +16,4 @@ Some different things I used:
 TODO:
 
 - try [NestJS](https://nestjs.com/)
+- instead of validating and including all artwork data in easel style, figure out the front-end needs, then validate and include properties we need for certain pages
